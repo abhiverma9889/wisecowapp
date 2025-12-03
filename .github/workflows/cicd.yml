@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Login to Docker Hub
@@ -26,7 +26,9 @@ jobs:
 
     - name: Deploy to Kubernetes
       uses: appleboy/k8s-deploy-action@v1.4.0
-
       with:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
-        manifests: k8s/
+        manifests: |
+          k8s/deployment.yaml
+          k8s/service.yaml
+          k8s/ingress.yaml
