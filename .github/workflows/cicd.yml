@@ -2,7 +2,7 @@ name: CI-CD Wisecow
 
 on:
   push:
-    branches: 
+    branches:
       - main
 
 jobs:
@@ -31,5 +31,22 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_USER }}/wisecow:latest
 
-    # 5️⃣ Set up kubectl
-    - name: Set up kube
+    # 5️⃣ Install kubectl
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: latest
+
+    # 6️⃣ Configure kubeconfig
+    - name: Configure kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+
+    # 7️⃣ Deploy to Kubernetes
+    - name: Deploy to Kubernetes
+      env:
+        IMAGE: ${{ secrets.DOCKER_USER }}/wisecow:latest
+      run: |
+        kubectl set image deployment/wisecow wisecow=$IMAGE --record
+        kubectl apply -f k8s/
