@@ -1,4 +1,4 @@
-name: Build & Deploy Wisecow
+name: CI-CD Wisecow
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout
       uses: actions/checkout@v3
 
     - name: Login to Docker Hub
@@ -18,10 +18,10 @@ jobs:
         username: ${{ secrets.DOCKER_USER }}
         password: ${{ secrets.DOCKER_PASS }}
 
-    - name: Build Image
+    - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKER_USER }}/wisecow:latest .
 
-    - name: Push Image
+    - name: Push image
       run: docker push ${{ secrets.DOCKER_USER }}/wisecow:latest
 
     - name: Deploy to Kubernetes
