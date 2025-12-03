@@ -21,11 +21,11 @@ jobs:
     - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKER_USER }}/wisecow:latest .
 
-    - name: Push image
+    - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USER }}/wisecow:latest
 
     - name: Deploy to Kubernetes
-      uses: appleboy/k8s-deploy-action@v1.4.0
+      uses: appleboy/kubernetes-action@v1.0.0
       with:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
         manifests: k8s/
