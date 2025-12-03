@@ -25,7 +25,8 @@ jobs:
       run: docker push ${{ secrets.DOCKER_USER }}/wisecow:latest
 
     - name: Deploy to Kubernetes
-      uses: appleboy/kubernetes-action@v1.0.0
+      uses: appleboy/k8s-deploy-action@v1.4.0
+
       with:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
         manifests: k8s/
