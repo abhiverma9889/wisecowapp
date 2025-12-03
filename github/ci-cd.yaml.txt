@@ -1,0 +1,31 @@
+name: Build & Deploy Wisecow
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASS }}
+
+    - name: Build Image
+      run: docker build -t ${{ secrets.DOCKER_USER }}/wisecow:latest .
+
+    - name: Push Image
+      run: docker push ${{ secrets.DOCKER_USER }}/wisecow:latest
+
+    - name: Deploy to Kubernetes
+      uses: appleboy/k8s-deploy-action@v1.4.0
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        manifests: k8s/
