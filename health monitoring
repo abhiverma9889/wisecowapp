@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# ===============================
+# Linux System Health Monitor
+# ===============================
+
+# Thresholds
+CPU_THRESHOLD=80
+MEM_THRESHOLD=80
+DISK_THRESHOLD=80
+PROC_THRESHOLD=300
+
+# Log file
+LOGFILE="/var/log/system_health.log"
+
+# Timestamp
+timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+# ===============================
+# CPU Usage
+# ===============================
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8}')
+cpu_usage=${cpu_usage%.*}  # remove decimal
+
+if [ "$cpu_usage" -gt "$CPU_THRESHOLD" ]; then
+    echo "$timestamp - ALERT: High CPU usage: ${cpu_usage}%" | tee -a "$LOGFILE"
+fi
+
+# ===============================
+# Memory Usage
+# ===============================
+mem_usage=$(free | awk '/Mem/{printf("%.0f"), $3/$2 * 100}')
+
+if [ "$mem_usage" -gt "$MEM_THRESHOLD" ]; then
+    echo "$timestamp - ALERT: High Memory usage: ${mem_usage}%" | tee -a "$LOGFILE"
+fi
+
+# ===============================
+# Disk Usage
+# ===============================
+disk_usage=$(df / | awk 'NR==2 {print substr($5, 1, length($5)-1)}')
+
+if [ "$disk_usage" -gt "$DISK_THRESHOLD" ]; then
+    echo "$timestamp - ALERT: High Disk usage: ${disk_usage}%" | tee -a "$LOGFILE"
+fi
+
+# ===============================
+# Running Processes
+# ===============================
+process_count=$(ps aux | wc -l)
+
+if [ "$process_count" -gt "$PROC_THRESHOLD" ]; then
+    echo "$timestamp - ALERT: Too many running processes: ${process_count}" | tee -a "$LOGFILE"
+fi
+
+# ===============================
+# Final Output
+# ===============================
+echo "$timestamp - Health check completed."
